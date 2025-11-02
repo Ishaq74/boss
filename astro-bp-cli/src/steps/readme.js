@@ -230,6 +230,41 @@ export function updateReadme(projectPath, plan, deps) {
   if ((deps.dev || []).length) commands.push(`${plan.pm === 'pnpm' ? 'pnpm add -D' : 'npm install -D'} ${deps.dev.join(' ')}`);
   for (const c of (deps.cli || [])) commands.push(c);
 
+  // Deployment helper commands (informational, not executed by CLI)
+  function deployHelpLines(target) {
+    if (!target || target === 'none') return [];
+    const L = ['Try it (deploy)'];
+    if (target === 'vercel') {
+      L.push('```powershell');
+      L.push('# depuis le dossier du projet');
+      L.push('pnpm build');
+      L.push('npx vercel');
+      L.push('npx vercel deploy');
+      L.push('```');
+    } else if (target === 'netlify') {
+      L.push('```powershell');
+      L.push('pnpm build');
+      L.push('npx netlify init');
+      L.push('npx netlify deploy --build');
+      L.push('# ou pour production');
+      L.push('npx netlify deploy --prod');
+      L.push('```');
+    } else if (target === 'cloudflare') {
+      L.push('```powershell');
+      L.push('pnpm build');
+      L.push('npx wrangler login');
+      L.push('npx wrangler deploy');
+      L.push('```');
+    } else if (target === 'node') {
+      L.push('```powershell');
+      L.push('pnpm build');
+      L.push('# démarrer le serveur Node (adapter node)');
+      L.push('node .\\dist\\server\\entry.mjs');
+      L.push('```');
+    }
+    return L;
+  }
+
   // Quick stack (one-liner)
   const provider = (plan.db?.dev?.provider !== 'none') ? plan.db.dev.provider : plan.db?.local?.provider;
   const adapter = plan.db?.dev?.adapter || plan.db?.local?.adapter;
@@ -245,6 +280,7 @@ export function updateReadme(projectPath, plan, deps) {
     '',
     `- Project: ${plan.projectName}`,
     `- Package manager: ${plan.pm}`,
+    ...(plan.deploy && plan.deploy !== 'none' ? [`- Deploy target: ${plan.deploy}`] : []),
     '',
   '### Quick stack',
   quickStack,
@@ -268,6 +304,7 @@ export function updateReadme(projectPath, plan, deps) {
     '### Design',
     designBlock,
     '',
+  ...(plan.deploy && plan.deploy !== 'none' ? ['### Deployment', `- Target: ${plan.deploy}`, '', ...deployHelpLines(plan.deploy), ''] : []),
     '### Components tree',
     '```text',
     compTree,

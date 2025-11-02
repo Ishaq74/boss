@@ -200,6 +200,37 @@ pnpm preview
 - Sur PowerShell, enchaînez des commandes avec `;` si nécessaire.
 - Les appels interactifs (`create astro@latest`, `astro add`) masquent l’écho des commandes; vous pouvez forcer le silence global via `ASTRO_BP_SILENT`.
 
+## Déploiement (simple via astro add)
+
+Dans un projet généré, ajoutez l’adapter de votre cible avec l’outil officiel Astro, puis déployez selon la plateforme.
+
+Vercel
+
+```powershell
+# Dans le dossier du projet créé
+pnpm dlx astro add vercel
+# ou
+npx astro add vercel
+```
+
+Netlify
+
+```powershell
+pnpm dlx astro add netlify
+# ou
+npx astro add netlify
+```
+
+Node / VPS (mode serveur Node)
+
+```powershell
+pnpm dlx astro add node
+# ou
+npx astro add node
+```
+
+Docker (VPS): un `Dockerfile` multi‑stage sera ajouté prochainement. En attendant, vous pouvez générer un build Node (`astro add node`) puis dockeriser l’output.
+
 ## Roadmap
 
 - Flags CLI: `--fast`, `--yes`, `--no-memory`

@@ -64,6 +64,11 @@ export function computePlanCommands(plan) {
     devPkgs.add('drizzle-kit');
   }
 
+  // Deployment adapter (via astro add)
+  if (plan.deploy && plan.deploy !== 'none') {
+    cliCmds.push(pm === 'pnpm' ? `pnpm dlx astro add ${plan.deploy}` : `npx astro add ${plan.deploy}`);
+  }
+
   return {
     runtime: Array.from(runtimePkgs).sort(),
     dev: Array.from(devPkgs).sort(),
@@ -268,6 +273,9 @@ export async function reviewAndConfirm(plan) {
   lines.push('');
   lines.push(`${color.bold('Projet:')} ${plan.projectName}`);
   lines.push(`${color.bold('PM:')} ${plan.pm}`);
+  if (plan.deploy && plan.deploy !== 'none') {
+    lines.push(`${color.bold('Deploy:')} ${plan.deploy}`);
+  }
   lines.push('');
   // Package first
   lines.push(color.bold('▸ package.json (sans versions)'));
@@ -298,6 +306,7 @@ export async function reviewAndConfirm(plan) {
   lines.push(`  ${color.green('+')} ${color.gray(': créé, ')}${color.yellow('~')}${color.gray(': modifié')}`);
   lines.push(`  ${color.gray('DB:')} provider=${provider || 'none'}, adapter=${adapter || 'none'}, dialect=${dialect}`);
   if (plan.auth?.provider) lines.push(`  ${color.gray('Auth:')} ${plan.auth.provider}${plan.auth.provider==='better-auth' ? `, plugins=[${(plan.auth.plugins||[]).join(', ')}], email=${plan.auth.email||'none'}` : ''}`);
+  if (plan.deploy && plan.deploy !== 'none') lines.push(`  ${color.gray('Deploy:')} ${plan.deploy} ${color.dim('(adapter via astro add)')}`);
   lines.push('');
   lines.push(color.bold('▸ Fichiers'));
   const treeLines = buildTree(files);

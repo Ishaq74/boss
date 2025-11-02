@@ -1,5 +1,6 @@
 import prompts from 'prompts';
 import { chooseDbAndAuth } from './dbAuth.js';
+import { chooseDeploy } from './deploy.js';
 
 export async function collectFastChoices(prev, onCancel) {
   // Extras selection (no side effects)
@@ -87,5 +88,8 @@ export async function collectFastChoices(prev, onCancel) {
     auth.email = emailAsk.email || 'none';
   }
 
-  return { extras: Array.isArray(extra) ? extra : [], iconSets, same, devDb, localDb, auth };
+  // Deployment target
+  const deploy = await chooseDeploy(prev, onCancel);
+
+  return { extras: Array.isArray(extra) ? extra : [], iconSets, same, devDb, localDb, auth, deploy };
 }

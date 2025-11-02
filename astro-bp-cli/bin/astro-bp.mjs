@@ -16,6 +16,7 @@ import { persist } from '../src/steps/persist.js';
 import { collectFastChoices } from '../src/steps/fastMode.js';
 import { reviewAndConfirm, computePlanCommands } from '../src/steps/review.js';
 import { updateReadme } from '../src/steps/readme.js';
+import { chooseDeploy, addDeployAdapter } from '../src/steps/deploy.js';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -100,6 +101,13 @@ async function main() {
       auth.email = res.auth.email;
     }
 
+    // Déploiement
+    const deployTarget = await chooseDeploy({ last: prev?.last }, onCancel);
+    if (deployTarget && deployTarget !== 'none') {
+      const res = addDeployAdapter(pm, projectPath, deployTarget);
+      if (res.status !== 0) console.error(`Échec lors de l'exécution: astro add ${deployTarget}`);
+    }
+
     const runData = {
       projectName,
       packageManager: pm,
@@ -107,13 +115,14 @@ async function main() {
       extras: Array.isArray(extra) ? extra : [],
       iconSets: selectedIconSets,
       db: { same, dev: devDb, local: localDb },
-      auth
+      auth,
+      deploy: deployTarget
     };
   persist(cacheDir, runData);
   await writeEnvFiles(projectPath, devDb, localDb, auth, onCancel);
   ensureAliases(projectPath);
   // README summary (realtime)
-  const finalPlan = { pm, projectName, projectPath, extras: Array.isArray(extra) ? extra : [], iconSets: selectedIconSets, db: { same, dev: devDb, local: localDb }, auth };
+  const finalPlan = { pm, projectName, projectPath, extras: Array.isArray(extra) ? extra : [], iconSets: selectedIconSets, db: { same, dev: devDb, local: localDb }, auth, deploy: deployTarget };
   const deps = computePlanCommands(finalPlan);
   const cmdsPreview = [];
   if (deps.runtime.length) cmdsPreview.push(pm === 'pnpm' ? `pnpm add ${deps.runtime.join(' ')}` : `npm install ${deps.runtime.join(' ')}`);
@@ -134,7 +143,8 @@ async function main() {
       extras: fast.extras,
       iconSets: fast.iconSets,
       db: { same: fast.same, dev: fast.devDb, local: fast.localDb },
-      auth: fast.auth
+      auth: fast.auth,
+      deploy: fast.deploy
     };
     const ok = await reviewAndConfirm(plan);
     if (!ok) {
@@ -157,7 +167,7 @@ async function main() {
     }
 
     // Install aggregated dependencies and run planned CLI commands (matches summary)
-    const finalPlan = { pm, projectName, projectPath, extras: extra, iconSets: selectedIconSets, db: { same: fast.same, dev: fast.devDb, local: fast.localDb }, auth };
+  const finalPlan = { pm, projectName, projectPath, extras: extra, iconSets: selectedIconSets, db: { same: fast.same, dev: fast.devDb, local: fast.localDb }, auth, deploy: fast.deploy };
     const deps = computePlanCommands(finalPlan);
     if (deps.runtime.length) {
       const cmd = pm === 'pnpm' ? `pnpm add ${deps.runtime.join(' ')}` : `npm install ${deps.runtime.join(' ')}`;
@@ -181,7 +191,8 @@ async function main() {
       extras: Array.isArray(extra) ? extra : [],
       iconSets: selectedIconSets,
       db: { same: fast.same, dev: fast.devDb, local: fast.localDb },
-      auth
+      auth,
+      deploy: fast.deploy
     };
   persist(cacheDir, runData);
   await writeEnvFiles(projectPath, fast.devDb, fast.localDb, auth, onCancel, { nonInteractive: true });
