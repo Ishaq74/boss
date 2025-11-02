@@ -1,0 +1,32 @@
+# Node / monorepo basics
+node_modules/
+.pnpm-store/
+
+# Build outputs
+.dist/
+dist/
+build/
+coverage/
+
+# Astro
+.astro/
+
+# Logs
+npm-debug.log*
+yarn-error.log
+pnpm-debug.log*
+
+# Env files (keep examples)
+.env
+.env.*
+!.env.example
+
+# Caches and tooling
+.cache/
+.tmp/
+.DS_Store
+.vscode/
+
+# OS / Editor
+Thumbs.db
+*.swp
