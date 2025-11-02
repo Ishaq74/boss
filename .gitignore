@@ -30,3 +30,13 @@ pnpm-debug.log*
 # OS / Editor
 Thumbs.db
 *.swp
+
+# Local playgrounds / examples (do not commit experimental projects)
+/examples/
+/demos/
+/demo*/
+/playground*/
+/sandbox*/
+/test*/
+/tmp*/
+/pipi/

@@ -7,10 +7,10 @@ Ce dépôt contient une CLI Astro « astro-bp-cli » et l’espace pour vos proj
 ```text
 boss/
 ├── astro-bp-cli/        # CLI Node ESM pour créer/booster un projet Astro
-└── <vos-projets-astro>  # Placez ici vos projets d’exemple/démo (non listés volontairement)
+└── examples/            # Vos projets Astro d’essai (ignorés par Git)
 ```
 
-Note: Nous n’affichons pas les dossiers d’exemples/tests dans ce README. Créez-les simplement à côté de `astro-bp-cli/` dans `boss/` (ex: `boss/mon-projet-astro/`).
+Note: Placez vos projets d’essai dans `boss/examples/` pour éviter de les pousser par erreur (le dossier est ignoré par Git). Si vous voulez versionner un exemple, renommez-le et sortez-le de `examples/`.
 
 ## astro-bp-cli — la CLI
 
